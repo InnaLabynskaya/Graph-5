@@ -53,7 +53,7 @@
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextClearRect(context, rect);
-    CGContextSetRGBFillColor(context, 255, 255, 255, 1);
+    CGContextSetRGBFillColor(context, 255, 255, 255, 0);
     CGContextFillRect(context, rect);
     if (self.node.countURLs > 0 && self.node.countURLs < 5) {
         CGContextSetRGBFillColor(context, (255.0), (255.0), 0, 1);
