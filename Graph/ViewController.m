@@ -11,8 +11,10 @@
 
 #define DegreesToRadians(x) ((x) * M_PI / 180.0)
 
-static NSUInteger const NodeSize = 30;
+static NSUInteger NodeSize = 30;
 static NSUInteger const NodeDistance = 5;
+static double const CircleDistance = 40.0;
+static double const GenerationDistance = 100.0;
 
 @interface ViewController () <UIScrollViewDelegate>
 
@@ -51,143 +53,119 @@ static NSUInteger const NodeDistance = 5;
 - (void)updateNodesView
 {
     [self.containerView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
+
     Node *rootNode = self.graph.rootNode;
+    NSUInteger currentGenerationLevel = 0;
+    NSMutableSet *visitedNodes = [NSMutableSet set];
+    NSMutableArray *currentGeneration = [NSMutableArray array];
+    NSMutableSet *nextGeneration = [NSMutableSet set];
+    NSMutableArray *Generations = [NSMutableArray array];
+    [currentGeneration addObject:rootNode];
+    double minRadius = 0;
     
-    NSArray *firstGeneration = [self.graph firstGenerationFromNode:rootNode];
-    NSMutableArray *secondGenerationMutableArray = [NSMutableArray array];
-    NSArray *secondGenerationFiltered = [NSArray array];
     
-    if (!firstGeneration.count) {
-        [self.containerView setFrame:self.view.frame];
-        [self.scrollView setContentSize:self.view.frame.size];
-        NodeView *rootNodeView = [[NodeView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2, self.view.frame.size.height/2, NodeSize, NodeSize)];
-        rootNodeView.node = rootNode;
-        rootNodeView.layer.cornerRadius = rootNodeView.bounds.size.width/2;
-        rootNodeView.layer.masksToBounds = YES;
-        [self.containerView addSubview:rootNodeView];
-    } else {
-        NSInteger FirstCircleCount = 20;
-        const float DeltaRaius = 40;
-        float firstCircleRadius = [self circleRadiusForNodeCount:FirstCircleCount];
-        
-        NSInteger nodesCount = firstGeneration.count;
-        NSInteger workNodesCount = nodesCount - FirstCircleCount;
-        float workRadius = firstCircleRadius;
-        NSUInteger circles = 1;
-        while (workNodesCount > 0) {
-            workRadius += DeltaRaius;
-            workNodesCount -= [self nodesCountForRadius:workRadius];
-            circles ++;
-        }
-        
-        double dAlpha = 2 * M_PI / nodesCount;
+    [Generations addObject:currentGeneration];
+
+    for (NSMutableArray *generation in Generations) {
+    
+        [visitedNodes addObjectsFromArray:generation];
+        NSUInteger nodesCount = generation.count;
+        NSUInteger circles = [self circlesForNodesCount:nodesCount withMinRadius:minRadius];
+        double dAlpha = 1.95 * M_PI / nodesCount;
         double alpha = 0;
-        NSUInteger xCenter = workRadius + NodeSize/2;
-        NSUInteger yCenter = workRadius + NodeSize/2;
-        
-        [self.containerView setFrame:CGRectMake(0, 0, 10*workRadius + NodeSize, 10*workRadius + NodeSize)];
-        [self.scrollView setContentSize:CGSizeMake(10*workRadius + NodeSize, 10*workRadius + NodeSize)];
-        NodeView *nodeViewFirst = [[NodeView alloc] initWithFrame:CGRectMake(xCenter, yCenter, NodeSize, NodeSize)];
-        nodeViewFirst.node = rootNode;
-        nodeViewFirst.layer.cornerRadius = nodeViewFirst.bounds.size.width/2;
-        nodeViewFirst.layer.masksToBounds = YES;
-        [self.containerView addSubview:nodeViewFirst];
-        
-        NSUInteger circleIndex = 0;
-        for (Node *node in firstGeneration) {
-            float r = (firstCircleRadius + DeltaRaius * circleIndex);
-            int x = xCenter + r * cos(alpha);
-            int y = yCenter + r * sin(alpha);
+        NSUInteger currentCircle = 0;
+        for(Node *node in generation) {
+            NodeView *nodeView = [self nodeViewForNode:node withGeneration:currentGenerationLevel];
+            double radius = minRadius + currentCircle * CircleDistance;
+            nodeView.center = CGPointMake(radius * cos(alpha), radius * sin(alpha));
+            currentCircle = (currentCircle + 1) % circles;
             alpha += dAlpha;
-            circleIndex = (circleIndex + 1) % circles;
-            NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(x, y, 0.8 * NodeSize, 0.8 * NodeSize)];
-            nodeView.node = node;
-            nodeView.layer.cornerRadius = nodeView.bounds.size.width/2;
-            nodeView.layer.masksToBounds = YES;
-            NSArray *secondGeneration = [self.graph firstGenerationFromNode:node];
-            
-            nodeView.alpha = 0.8;
-            CALayer *shadowLayer = nodeView.layer;
-            shadowLayer.shadowOffset = CGSizeMake(1, 1);
-            shadowLayer.shadowColor = [[UIColor blackColor] CGColor];
-            shadowLayer.shadowRadius = 4.0f;
-            shadowLayer.shadowOpacity = 0.80f;
-            shadowLayer.shadowPath = [[UIBezierPath bezierPathWithRect:shadowLayer.bounds] CGPath];
-            UITapGestureRecognizer *nodeFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapNodeView:)];
-            [nodeView addGestureRecognizer:nodeFingerTap];
             [self.containerView addSubview:nodeView];
-            //            UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(xCenter-r + NodeSize/2, yCenter + NodeSize/2, r, 1)];
-//            lineView.backgroundColor = [UIColor blackColor];
-//            lineView.transform = CGAffineTransformMakeRotation(0 + alpha);
-//            [self.containerView addSubview:lineView];
-            [secondGenerationMutableArray addObjectsFromArray:secondGeneration];
-            NSMutableSet *visited = [NSMutableSet setWithObject:nodeView.node.url];
-            secondGenerationFiltered = [secondGenerationMutableArray filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT (SELF.url in %@)", visited]];
-
-            }
-       
+             minRadius += circles * CircleDistance + GenerationDistance;
+//            [Generations addObjectsFromArray:children];
         }
-    
-    NSInteger thirdCircleCount = 100;
-    const float DeltaRaius = 40;
-    float thirdCircleRadius = [self circleRadiusForNodeCount:thirdCircleCount];
-    
-    NSInteger nodesCount = secondGenerationFiltered.count;
-    NSInteger workNodesCount = nodesCount - thirdCircleCount;
-    float workRadius = thirdCircleRadius;
-    NSUInteger circles = 1;
-    while (workNodesCount > 0) {
-        workRadius += DeltaRaius;
-        workNodesCount -= [self nodesCountForRadius:workRadius];
-        circles ++;
-    }
-    
-    double dAlpha = 2 * M_PI / nodesCount;
-    double alpha = 0;
-    NSUInteger xCenter = workRadius + NodeSize/2;
-    NSUInteger yCenter = workRadius + NodeSize/2;
-    NSUInteger circleIndex = 0;
-
-        for (Node *secondGener in secondGenerationFiltered) {
-        float r = (thirdCircleRadius + DeltaRaius * circleIndex);
-        int x = xCenter + r * cos(alpha);
-        int y = yCenter + r * sin(alpha);
-        alpha += dAlpha;
-        circleIndex = (circleIndex + 1) % circles;
-        NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(x, y, 0.7 * NodeSize, 0.7 * NodeSize)];
-        nodeView.node = secondGener;
-        [self.containerView addSubview:nodeView];
-        nodeView.alpha = 0.4;
+     
         
+        for(Node*node in generation) {
+        NSArray *children = [self.graph firstGenerationFromNode:node];
+            [nextGeneration addObjectsFromArray:children];
+
+        [nextGeneration minusSet:visitedNodes];
+        [generation addObjectsFromArray:[nextGeneration allObjects]];
+        [nextGeneration removeAllObjects];
+        [Generations addObject:generation];
+        currentGenerationLevel++;
+        }
+        NSUInteger width = MAX(2*minRadius, self.view.frame.size.width);
+        NSUInteger height = MAX(2*minRadius, self.view.frame.size.height);
+        [self.containerView setFrame:CGRectMake(0, 0, width, height)];
+        [self.scrollView setContentSize:CGSizeMake(width, height)];
+        CGAffineTransform move = CGAffineTransformMakeTranslation(width/2, height/2);
+        for (NodeView *nodeView in self.containerView.subviews) {
+            [nodeView setTransform:move];
+        }
 
     }
     
-//    __block int x = 10;
-//    __block int y = 20;
-//    [self.graph.nodes enumerateKeysAndObjectsUsingBlock:^(NSString *url, Node *node, BOOL *stop) {
-//        NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(x, y, 30, 30)];
-//        nodeView.node = node;
-//        [self.containerView addSubview:nodeView];
-////        for(int k = 0; k < nodeView.node.countURLs;k++) {
-////            UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(x + 30, y + 15, 30, 1)];
-////            lineView.backgroundColor = [UIColor blackColor];
-////            lineView.transform = CGAffineTransformMakeRotation(DegreesToRadians(0 - k));
-////            [self.containerView addSubview:lineView];
-////        }
-//        UITapGestureRecognizer *nodeFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapNodeView:)];
-//        
-//       
-//        [nodeView addGestureRecognizer:nodeFingerTap];
-//        
-//        x += 40;
-//        if (x > 280 ) {
-//            x = 290;
-//            y += 40;
+    
+    
+    
+//    do {
+//        [visitedNodes addObjectsFromArray:currentGeneration];
 //
+//        NSUInteger nodesCount = currentGeneration.count;
+//        NSUInteger circles = [self circlesForNodesCount:nodesCount withMinRadius:minRadius];
+//        double dAlpha = 1.95 * M_PI / nodesCount;
+//        double alpha = 0;
+//        NSUInteger currentCircle = 0;
+//        for (Node *node in currentGeneration) {
+//            NodeView *nodeView = [self nodeViewForNode:node withGeneration:currentGenerationLevel];
+//            double radius = minRadius + currentCircle*CircleDistance;
+//            nodeView.center = CGPointMake(radius * cos(alpha), radius * sin(alpha));
+//            currentCircle = (currentCircle + 1) % circles;
+//            alpha += dAlpha;
+//            [self.containerView addSubview:nodeView];
 //        }
-//    }];
-//    [self.scrollView setContentSize:CGSizeMake(350, y + 50)];
+//        minRadius += circles * CircleDistance + GenerationDistance;
+//        
+//        while (currentGeneration.count) {
+//            Node *node = currentGeneration.lastObject;
+//            [currentGeneration removeObject:node];
+//            NSArray *children = [self.graph firstGenerationFromNode:node];
+//            [nextGeneration addObjectsFromArray:children];
+//        }
+//
+//        [nextGeneration minusSet:visitedNodes];
+//        [currentGeneration addObjectsFromArray:[nextGeneration allObjects]];
+//        [nextGeneration removeAllObjects];
+//        currentGenerationLevel++;
+//    } while (currentGeneration.count);
+//    
+//    NSUInteger width = MAX(2*minRadius, self.view.frame.size.width);
+//    NSUInteger height = MAX(2*minRadius, self.view.frame.size.height);
+//    [self.containerView setFrame:CGRectMake(0, 0, width, height)];
+//    [self.scrollView setContentSize:CGSizeMake(width, height)];
+//    CGAffineTransform move = CGAffineTransformMakeTranslation(width/2, height/2);
+//    for (NodeView *nodeView in self.containerView.subviews) {
+//        [nodeView setTransform:move];
+//    }
+}
+
+- (NodeView*)nodeViewForNode:(Node*)node withGeneration:(NSUInteger)generation
+{
+    NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(0, 0, NodeSize, NodeSize)];
+    nodeView.node = node;
+    nodeView.layer.cornerRadius = NodeSize/2;
+    nodeView.layer.masksToBounds = YES;
+    nodeView.alpha = 1.0 / (generation + 1.0);
+    //NodeSize = NodeSize/(generation + 1.0);
+    return nodeView;
+}
+
+- (NSUInteger)circlesForNodesCount:(NSUInteger)nodesCount withMinRadius:(double)minRadius
+{
+    NSUInteger countForMinCircle = MAX(1, [self nodesCountForRadius:minRadius]);
+    return ((nodesCount - 1) / countForMinCircle) + 1;
 }
 
 //The event handling method
