@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Node.h"
+#import "NodeForURL.h"
 #import "Graph.h"
 #import "TFHpple.h"
 

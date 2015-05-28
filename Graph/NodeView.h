@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Node.h"
+#import "NodeForURL.h"
 #import "LineView.h"
 
 @interface NodeView : UIView
 
-@property (nonatomic, strong) Node *node;
+@property (nonatomic, strong) NodeForURL *node;
 
 @end

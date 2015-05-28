@@ -7,22 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Node.h"
+#import "NodeForURL.h"
 
 @interface Graph : NSObject
 
 @property (nonatomic, strong, readonly) NSString *rootUrl;
 @property (nonatomic, strong, readonly) NSMutableDictionary *nodes;
-@property (nonatomic, strong, readonly) Node *rootNode;
+@property (nonatomic, strong, readonly) NodeForURL *rootNode;
 
 - (instancetype)initGraphWithRootLink:(NSString*)rootUrl;
-- (void)addNode:(Node *)node;
-- (Node*)nodeForUrl:(NSString*)url;
+- (void)addNode:(NodeForURL *)node;
+- (NodeForURL*)nodeForUrl:(NSString*)url;
 - (void)buildSiteMap;
 - (void)buildSiteMapWithMaxIterations:(NSUInteger)maxIter;
-- (void)breadthFirstSearchFromNode:(Node*)node maxIterations:(NSUInteger)maxIterations;
+- (void)breadthFirstSearchFromNode:(NodeForURL*)node maxIterations:(NSUInteger)maxIterations;
 
 - (void)buildNextGeneration;
-- (NSArray*)firstGenerationFromNode:(Node*)node;
+- (NSArray*)firstGenerationFromNode:(NodeForURL*)node;
 
 @end

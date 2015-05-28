@@ -40,9 +40,10 @@ NSDictionary *DictionaryForNode(xmlNodePtr currentNode, NSMutableDictionary *par
                 resultForNode[@"nodeContent"] = currentNodeContent;
             }
             return resultForNode;
-        } else {
-            resultForNode[@"nodeContent"] = currentNodeContent;
         }
+//            else {
+//            resultForNode[@"nodeContent"] = currentNodeContent;
+//        }
         xmlFree(nodeContent);
     }
 

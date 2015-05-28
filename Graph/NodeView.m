@@ -43,32 +43,32 @@
     [self addSubview:self.urlLabel];
 }
 
-- (void)setNode:(Node *)node
+- (void)setNode:(NodeForURL *)node
 {
     _node = node;
     self.urlLabel.text = [@(node.countURLs) stringValue];//node.url;
 }
 
-- (void)drawRect:(CGRect)rect
-{
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextClearRect(context, rect);
-    CGContextSetRGBFillColor(context, 255, 255, 255, 0);
-    CGContextFillRect(context, rect);
-    if (self.node.countURLs > 0 && self.node.countURLs < 5) {
-        CGContextSetRGBFillColor(context, (255.0), (255.0), 0, 1);
-    } else if (self.node.countURLs >= 5 && self.node.countURLs < 10) {
-        CGContextSetRGBFillColor(context, 255,0, 0, 1);
-    } else if (self.node.countURLs >= 10 && self.node.countURLs < 20) {
-        CGContextSetRGBFillColor(context, 0, 255, 0, 1);
-    } else if (self.node.countURLs >= 20 && self.node.countURLs < 30){
-        CGContextSetRGBFillColor(context, 0, 0, 255, 1);
-    } else {
-        CGContextSetRGBFillColor(context, 255, (128/255.0), 0, 1);
-    }
-    
-    CGContextFillEllipseInRect(context, rect);
-    CGContextSetShadow(context, CGSizeMake(80, 80), 5);
-}
+//- (void)drawRect:(CGRect)rect
+//{
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    CGContextClearRect(context, rect);
+//    CGContextSetRGBFillColor(context, 255, 255, 255, 0);
+//    CGContextFillRect(context, rect);
+//    if (self.node.countURLs > 0 && self.node.countURLs < 5) {
+//        CGContextSetRGBFillColor(context, (255.0), (255.0), 0, 1);
+//    } else if (self.node.countURLs >= 5 && self.node.countURLs < 10) {
+//        CGContextSetRGBFillColor(context, 255,0, 0, 1);
+//    } else if (self.node.countURLs >= 10 && self.node.countURLs < 20) {
+//        CGContextSetRGBFillColor(context, 0, 255, 0, 1);
+//    } else if (self.node.countURLs >= 20 && self.node.countURLs < 30){
+//        CGContextSetRGBFillColor(context, 0, 0, 255, 1);
+//    } else {
+//        CGContextSetRGBFillColor(context, 255, (128/255.0), 0, 1);
+//    }
+//    
+//    CGContextFillEllipseInRect(context, rect);
+//    CGContextSetShadow(context, CGSizeMake(80, 80), 5);
+//}
 
 @end

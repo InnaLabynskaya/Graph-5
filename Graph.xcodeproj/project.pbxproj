@@ -21,8 +21,9 @@
 		E9B7A13D1B03515E0020DEF9 /* TFHpple.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A1381B03515E0020DEF9 /* TFHpple.m */; };
 		E9B7A13E1B03515E0020DEF9 /* TFHppleElement.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A13A1B03515E0020DEF9 /* TFHppleElement.m */; };
 		E9B7A13F1B03515E0020DEF9 /* XPathQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A13C1B03515E0020DEF9 /* XPathQuery.m */; };
-		E9B7A1431B0351A90020DEF9 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A1421B0351A90020DEF9 /* Node.m */; };
+		E9B7A1431B0351A90020DEF9 /* NodeForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A1421B0351A90020DEF9 /* NodeForURL.m */; };
 		E9B7A1461B03555B0020DEF9 /* Graph.m in Sources */ = {isa = PBXBuildFile; fileRef = E9B7A1451B03555B0020DEF9 /* Graph.m */; };
+		E9D524E01B173A5D006790B7 /* CircleNodeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9D524DF1B173A5D006790B7 /* CircleNodeView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,10 +62,12 @@
 		E9B7A13A1B03515E0020DEF9 /* TFHppleElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFHppleElement.m; sourceTree = "<group>"; };
 		E9B7A13B1B03515E0020DEF9 /* XPathQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPathQuery.h; sourceTree = "<group>"; };
 		E9B7A13C1B03515E0020DEF9 /* XPathQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XPathQuery.m; sourceTree = "<group>"; };
-		E9B7A1411B0351A90020DEF9 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
-		E9B7A1421B0351A90020DEF9 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Node.m; sourceTree = "<group>"; };
+		E9B7A1411B0351A90020DEF9 /* NodeForURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NodeForURL.h; sourceTree = "<group>"; };
+		E9B7A1421B0351A90020DEF9 /* NodeForURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NodeForURL.m; sourceTree = "<group>"; };
 		E9B7A1441B03555B0020DEF9 /* Graph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Graph.h; sourceTree = "<group>"; };
 		E9B7A1451B03555B0020DEF9 /* Graph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Graph.m; sourceTree = "<group>"; };
+		E9D524DF1B173A5D006790B7 /* CircleNodeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CircleNodeView.xib; sourceTree = "<group>"; };
+		E9D524E11B176430006790B7 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +97,7 @@
 				CEC079521B05282C00A225B8 /* NodeView.m */,
 				E92E3AB31B0A07D100CF209C /* LineView.h */,
 				E92E3AB41B0A07D100CF209C /* LineView.m */,
+				E9D524DF1B173A5D006790B7 /* CircleNodeView.xib */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -178,10 +182,11 @@
 		E9B7A1401B03517A0020DEF9 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				E9B7A1411B0351A90020DEF9 /* Node.h */,
-				E9B7A1421B0351A90020DEF9 /* Node.m */,
+				E9B7A1411B0351A90020DEF9 /* NodeForURL.h */,
+				E9B7A1421B0351A90020DEF9 /* NodeForURL.m */,
 				E9B7A1441B03555B0020DEF9 /* Graph.h */,
 				E9B7A1451B03555B0020DEF9 /* Graph.m */,
+				E9D524E11B176430006790B7 /* Node.h */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -268,6 +273,7 @@
 			files = (
 				E9B7A11A1B03509F0020DEF9 /* Main.storyboard in Resources */,
 				E9B7A11F1B03509F0020DEF9 /* LaunchScreen.xib in Resources */,
+				E9D524E01B173A5D006790B7 /* CircleNodeView.xib in Resources */,
 				E9B7A11C1B03509F0020DEF9 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,7 +294,7 @@
 			files = (
 				E9B7A1171B03509F0020DEF9 /* ViewController.m in Sources */,
 				E9B7A1141B03509F0020DEF9 /* AppDelegate.m in Sources */,
-				E9B7A1431B0351A90020DEF9 /* Node.m in Sources */,
+				E9B7A1431B0351A90020DEF9 /* NodeForURL.m in Sources */,
 				E9B7A1111B03509F0020DEF9 /* main.m in Sources */,
 				E92E3AB51B0A07D100CF209C /* LineView.m in Sources */,
 				E9B7A1461B03555B0020DEF9 /* Graph.m in Sources */,

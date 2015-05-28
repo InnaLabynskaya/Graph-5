@@ -63,7 +63,7 @@ static double const GenerationDistance = 100.0;
         double dAlpha = 1.95 * M_PI / nodesCount;
         double alpha = 0;
         NSUInteger currentCircle = 0;
-        for(Node *node in generation) {
+        for(NodeForURL *node in generation) {
             NodeView *nodeView = [self nodeViewForNode:node withGeneration:level];
             double radius = minRadius + currentCircle * CircleDistance;
             nodeView.center = CGPointMake(radius * cos(alpha), radius * sin(alpha));
@@ -86,7 +86,7 @@ static double const GenerationDistance = 100.0;
 
 - (NSArray*)arrayWithGenerations
 {
-    Node *rootNode = self.graph.rootNode;
+    NodeForURL *rootNode = self.graph.rootNode;
     NSMutableSet *visitedNodes = [NSMutableSet set];
     NSMutableArray *currentGeneration = [NSMutableArray array];
     NSMutableSet *nextGeneration = [NSMutableSet set];
@@ -97,7 +97,7 @@ static double const GenerationDistance = 100.0;
     for (NSUInteger i = 0; i < Generations.count; ++i) {
         NSArray *generation = Generations[i];
         [visitedNodes addObjectsFromArray:generation];
-        for (Node *node in generation) {
+        for (NodeForURL *node in generation) {
             NSArray *children = [self.graph firstGenerationFromNode:node];
             [nextGeneration addObjectsFromArray:children];
         }
@@ -110,14 +110,63 @@ static double const GenerationDistance = 100.0;
     return Generations;
 }
 
-- (NodeView*)nodeViewForNode:(Node*)node withGeneration:(NSUInteger)generation
+- (NodeView*)nodeViewForNode:(NodeForURL*)node withGeneration:(NSUInteger)generation
 {
     NSUInteger nodeSize = NodeSize - MIN(25, 5*generation);
     NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(0, 0, nodeSize, nodeSize)];
+    //NodeView *nodeView = [[[NSBundle mainBundle] loadNibNamed:@"CircleNodeView" owner:self options:nil]objectAtIndex:0];
     nodeView.node = node;
-    nodeView.layer.cornerRadius = NodeSize/2;
-    nodeView.layer.masksToBounds = YES;
+    //nodeView.layer.cornerRadius = NodeSize/2;
+    CAShapeLayer *circle = [CAShapeLayer layer];
+    
+    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, nodeSize, nodeSize)cornerRadius:nodeSize].CGPath;
+    circle.masksToBounds = NO;
+    circle.shadowOffset = CGSizeMake(-5, 10);
+    circle.shadowRadius = 5;
+    circle.shadowOpacity = 0.5;
+    circle.position = CGPointMake(CGRectGetMidX(nodeView.frame)-nodeSize/2,
+                                  CGRectGetMidY(nodeView.frame)-nodeSize/2);
+        if (node.countURLs > 0 && node.countURLs < 5) {
+            circle.fillColor = [[UIColor redColor] CGColor];
+        } else if (node.countURLs >= 5 && node.countURLs < 10) {
+            circle.fillColor = [[UIColor yellowColor] CGColor];
+        } else if (node.countURLs >=10 && node.countURLs < 20) {
+            circle.fillColor = [[UIColor orangeColor] CGColor];
+        } else if (node.countURLs >=20 && node.countURLs < 30) {
+            circle.fillColor = [[UIColor purpleColor] CGColor];
+        } else if (node.countURLs >=30 && node.countURLs < 50) {
+            circle.fillColor = [[UIColor greenColor] CGColor];
+        } else if (node.countURLs >=50 && node.countURLs <100) {
+            circle.fillColor = [[UIColor blueColor] CGColor];
+        } else if (node.countURLs >= 100 && node.countURLs <200) {
+            circle.fillColor = [[UIColor magentaColor] CGColor];
+        } else {
+            circle.fillColor = [[UIColor cyanColor] CGColor];
+        }
+
+    [nodeView.layer addSublayer:circle];
     nodeView.alpha = 1.0 / (generation + 1.0);
+
+//    nodeView.layer.masksToBounds = YES;
+//    nodeView.alpha = 1.0 / (generation + 1.0);
+//    if (node.countURLs > 0 && node.countURLs < 5) {
+//        nodeView.layer.backgroundColor = [[UIColor redColor] CGColor];
+//    } else if (node.countURLs >= 5 && node.countURLs < 10) {
+//        nodeView.layer.backgroundColor = [[UIColor yellowColor] CGColor];
+//    } else if (node.countURLs >=10 && node.countURLs < 20) {
+//        nodeView.layer.backgroundColor = [[UIColor orangeColor] CGColor];
+//    } else if (node.countURLs >=20 && node.countURLs < 30) {
+//        nodeView.layer.backgroundColor = [[UIColor purpleColor] CGColor];
+//    } else if (node.countURLs >=30 && node.countURLs < 50) {
+//        nodeView.layer.backgroundColor = [[UIColor greenColor] CGColor];
+//    } else if (node.countURLs >=50 && node.countURLs <100) {
+//        nodeView.layer.backgroundColor = [[UIColor blueColor] CGColor];
+//    } else if (node.countURLs >= 100 && node.countURLs <200) {
+//        nodeView.layer.backgroundColor = [[UIColor magentaColor] CGColor];
+//    } else {
+//        nodeView.layer.backgroundColor = [[UIColor cyanColor] CGColor];
+//    }
+    
     //NodeSize = NodeSize/(generation + 1.0);
     return nodeView;
 }

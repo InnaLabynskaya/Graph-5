@@ -13,7 +13,7 @@
 
 @property (strong, nonatomic, readwrite) NSMutableDictionary *nodes;
 @property (nonatomic, strong, readwrite) NSString *rootUrl;
-@property (nonatomic, strong, readwrite) Node *rootNode;
+@property (nonatomic, strong, readwrite) NodeForURL *rootNode;
 
 @end
 
@@ -26,7 +26,7 @@
         self.nodes = [NSMutableDictionary dictionary];
         NSURL *url = [NSURL URLWithString:rootUrl];
         self.rootUrl = [NSString stringWithFormat:@"%@://%@", [url scheme], [url host]];
-        self.rootNode = [[Node alloc] initWithUrl:@"/"];
+        self.rootNode = [[NodeForURL alloc] initWithUrl:@"/"];
         [self addNode:self.rootNode];
     }
     return self;
@@ -37,14 +37,14 @@
     return [self initGraphWithRootLink:nil];
 }
 
-- (void)addNode:(Node *)node
+- (void)addNode:(NodeForURL *)node
 {
     if (node && node.url) {
         [self.nodes setObject:node forKey:node.url];
     }
 }
 
-- (Node*)nodeForUrl:(NSString*)url
+- (NodeForURL*)nodeForUrl:(NSString*)url
 {
     return [self.nodes objectForKey:url];
 }
@@ -59,21 +59,21 @@
     [self breadthFirstSearchFromNode:self.rootNode maxIterations:maxIter];
 }
 
-- (void)breadthFirstSearchFromNode:(Node*)node maxIterations:(NSUInteger)maxIterations
+- (void)breadthFirstSearchFromNode:(NodeForURL*)node maxIterations:(NSUInteger)maxIterations
 {
     NSLog(@"Breath-first-search STARTS");
     NSMutableSet *visitedNodes = [NSMutableSet set];
     NSMutableArray *queue = [NSMutableArray arrayWithObject:node];
     NSUInteger iteration = 0;
     while (queue.count > 0 && iteration++ < maxIterations) {
-        Node *currentNode = queue.firstObject;
+        NodeForURL *currentNode = queue.firstObject;
         
         [self parseNode:currentNode];
         
         [visitedNodes addObject:currentNode];
         [queue removeObject:currentNode];
         for (NSString *nodeUrl in currentNode.edges) {
-            Node *newNode = [self nodeForUrl:nodeUrl];
+            NodeForURL *newNode = [self nodeForUrl:nodeUrl];
             if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
                 [queue addObject:newNode];
             }
@@ -89,14 +89,14 @@
     NSMutableSet *visitedNodes = [NSMutableSet set];
     NSMutableArray *queue = [NSMutableArray arrayWithObject:self.rootNode];
     while (queue.count > 0) {
-        Node *currentNode = queue.firstObject;
+        NodeForURL *currentNode = queue.firstObject;
         
         [self parseNode:currentNode];
         
         [visitedNodes addObject:currentNode];
         [queue removeObject:currentNode];
         for (NSString *nodeUrl in currentNode.edges) {
-            Node *newNode = [graphCopy objectForKey:nodeUrl];
+            NodeForURL *newNode = [graphCopy objectForKey:nodeUrl];
             if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
                 [queue addObject:newNode];
             }
@@ -107,7 +107,7 @@
 }
 
 
-- (void)parseNode:(Node *)node
+- (void)parseNode:(NodeForURL *)node
 {
     if (node.wasParsed) {
         return;
@@ -133,9 +133,9 @@
             }
             url = [url stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
             
-            Node *nextNode = [self nodeForUrl:url];
+            NodeForURL *nextNode = [self nodeForUrl:url];
             if (!nextNode) {
-                nextNode = [[Node alloc] initWithUrl:url];
+                nextNode = [[NodeForURL alloc] initWithUrl:url];
             }
             [self addNode:nextNode];
             [node addEdgeToNode:nextNode];
@@ -144,9 +144,9 @@
     }
 }
 
-- (NSArray*)firstGenerationFromNode:(Node*)node
+- (NSArray*)firstGenerationFromNode:(NodeForURL*)node
 {
-    return [self.nodes objectsForKeys:[node.edges allObjects] notFoundMarker:[[Node alloc] init]];
+    return [self.nodes objectsForKeys:[node.edges allObjects] notFoundMarker:[[NodeForURL alloc] init]];
 }
 
 

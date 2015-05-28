@@ -6,16 +6,16 @@
 //  Copyright (c) 2015 Inna Labuns'ka. All rights reserved.
 //
 
-#import "Node.h"
+#import "NodeForURL.h"
 
-@interface Node ()
+@interface NodeForURL () 
 
 @property (strong, nonatomic, readwrite) NSString *url;
 @property (strong, nonatomic, readwrite) NSMutableSet *edges;
 
 @end
 
-@implementation Node
+@implementation NodeForURL
 
 - (instancetype)initWithUrl:(NSString*)url
 {
@@ -34,13 +34,13 @@
     return [self initWithUrl:nil];
 }
 
-- (void)addEdgeToNode:(Node *)node
+- (void)addEdgeToNode:(NodeForURL *)node
 {
     [self.edges addObject:node.url];
     node.countURLs++;
 }
 
-- (void)removeEdgeToNode:(Node *)node
+- (void)removeEdgeToNode:(NodeForURL *)node
 {
     [self.edges removeObject:node.url];
 }
