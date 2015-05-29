@@ -49,16 +49,6 @@
     return [self.nodes objectForKey:url];
 }
 
-//- (void)buildSiteMap
-//{
-//    [self breadthFirstSearchFromNode:self.rootNode maxIterations:NSUIntegerMax];
-//}
-//
-//- (void)buildSiteMapWithMaxIterations:(NSUInteger)maxIter
-//{
-//    [self breadthFirstSearchFromNode:self.rootNode maxIterations:maxIter];
-//}
-
 - (void)breadthFirstSearchFromNode:(NodeForURL*)node handler:(void(^)(NodeForURL* node))handler
 {
      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -84,31 +74,6 @@
     }
     });
 }
-
-- (void)buildNextGeneration
-{
-    NSLog(@"Next Generation breath-first-search STARTS");
-    NSDictionary *graphCopy = [self.nodes copy];
-    NSMutableSet *visitedNodes = [NSMutableSet set];
-    NSMutableArray *queue = [NSMutableArray arrayWithObject:self.rootNode];
-    while (queue.count > 0) {
-        NodeForURL *currentNode = queue.firstObject;
-        
-        [self parseNode:currentNode];
-        
-        [visitedNodes addObject:currentNode];
-        [queue removeObject:currentNode];
-        for (NSString *nodeUrl in currentNode.edges) {
-            NodeForURL *newNode = [graphCopy objectForKey:nodeUrl];
-            if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
-                [queue addObject:newNode];
-            }
-        }
-    }
-    NSLog(@"%@", @(self.nodes.count));
-    NSLog(@"SEARCH ENDS");
-}
-
 
 - (void)parseNode:(NodeForURL *)node
 {
@@ -146,11 +111,5 @@
         node.wasParsed = YES;
     }
 }
-
-- (NSArray*)firstGenerationFromNode:(NodeForURL*)node
-{
-    return [self.nodes objectsForKeys:[node.edges allObjects] notFoundMarker:[[NodeForURL alloc] init]];
-}
-
 
 @end
