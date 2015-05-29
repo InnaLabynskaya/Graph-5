@@ -20,7 +20,8 @@
 - (NodeForURL*)nodeForUrl:(NSString*)url;
 - (void)buildSiteMap;
 - (void)buildSiteMapWithMaxIterations:(NSUInteger)maxIter;
-- (void)breadthFirstSearchFromNode:(NodeForURL*)node maxIterations:(NSUInteger)maxIterations;
+- (void)parseNode:(NodeForURL *)node;
+- (void)breadthFirstSearchFromNode:(NodeForURL*)node handler:(void(^)(NodeForURL* node))handler;
 
 - (void)buildNextGeneration;
 - (NSArray*)firstGenerationFromNode:(NodeForURL*)node;

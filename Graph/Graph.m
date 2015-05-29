@@ -49,37 +49,40 @@
     return [self.nodes objectForKey:url];
 }
 
-- (void)buildSiteMap
-{
-    [self breadthFirstSearchFromNode:self.rootNode maxIterations:NSUIntegerMax];
-}
+//- (void)buildSiteMap
+//{
+//    [self breadthFirstSearchFromNode:self.rootNode maxIterations:NSUIntegerMax];
+//}
+//
+//- (void)buildSiteMapWithMaxIterations:(NSUInteger)maxIter
+//{
+//    [self breadthFirstSearchFromNode:self.rootNode maxIterations:maxIter];
+//}
 
-- (void)buildSiteMapWithMaxIterations:(NSUInteger)maxIter
+- (void)breadthFirstSearchFromNode:(NodeForURL*)node handler:(void(^)(NodeForURL* node))handler
 {
-    [self breadthFirstSearchFromNode:self.rootNode maxIterations:maxIter];
-}
-
-- (void)breadthFirstSearchFromNode:(NodeForURL*)node maxIterations:(NSUInteger)maxIterations
-{
-    NSLog(@"Breath-first-search STARTS");
+     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+         NSLog(@"Breath-first-search STARTS");
     NSMutableSet *visitedNodes = [NSMutableSet set];
     NSMutableArray *queue = [NSMutableArray arrayWithObject:node];
-    NSUInteger iteration = 0;
-    while (queue.count > 0 && iteration++ < maxIterations) {
+  
+    while (queue.count > 0) {
         NodeForURL *currentNode = queue.firstObject;
         
         [self parseNode:currentNode];
-        
+       dispatch_async(dispatch_get_main_queue(), ^{
+           handler(node);
+       });
         [visitedNodes addObject:currentNode];
         [queue removeObject:currentNode];
         for (NSString *nodeUrl in currentNode.edges) {
             NodeForURL *newNode = [self nodeForUrl:nodeUrl];
             if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
                 [queue addObject:newNode];
-            }
+            } 
         }
     }
-    NSLog(@"SEARCH ENDS");
+    });
 }
 
 - (void)buildNextGeneration

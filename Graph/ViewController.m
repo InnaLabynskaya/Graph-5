@@ -19,8 +19,8 @@ static double const GenerationDistance = 100.0;
 @interface ViewController () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) Graph *graph;
-@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (weak, nonatomic) IBOutlet UIView *containerView;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (strong, nonatomic) IBOutlet UIView *containerView;
 @property (nonatomic) NSUInteger gestureCount;
 @property (nonatomic) BOOL buildInProgress;
 
@@ -31,25 +31,31 @@ static double const GenerationDistance = 100.0;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.gestureCount = 0;
-    self.scrollView.minimumZoomScale = 0.5;
-    self.scrollView.maximumZoomScale = 5.0;
-    self.scrollView.delegate = self;
-    self.scrollView.contentSize = self.containerView.frame.size;
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinchWithGestureRecognizer:)];
-    [self.scrollView addGestureRecognizer:pinchGestureRecognizer];
-    self.graph = [[Graph alloc] initGraphWithRootLink:@"http://www.raywenderlich.com"];
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    [self updateNodesView];
-}
 
+- (void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    self.containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1500, 1500)];
+    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 1500, 1500)];
+    self.scrollView.minimumZoomScale = 0.5;
+    self.scrollView.maximumZoomScale = 5.0;
+    self.scrollView.delegate = self;
+    self.scrollView.contentSize = self.containerView.frame.size;
+    
+    self.graph = [[Graph alloc] initGraphWithRootLink:@"http://www.raywenderlich.com"];
+    [self.graph breadthFirstSearchFromNode:self.graph.rootNode handler:^(NodeForURL *node) {
+        NodeView *nodeView = [self nodeViewForNode:node];
+        [self.scrollView addSubview:nodeView];
+    }];
+    
+}
 - (void)updateNodesView
 {
     NSArray *generations = [self arrayWithGenerations];
@@ -64,7 +70,7 @@ static double const GenerationDistance = 100.0;
         double alpha = 0;
         NSUInteger currentCircle = 0;
         for(NodeForURL *node in generation) {
-            NodeView *nodeView = [self nodeViewForNode:node withGeneration:level];
+            NodeView *nodeView = [self nodeViewForNode:node];
             double radius = minRadius + currentCircle * CircleDistance;
             nodeView.center = CGPointMake(radius * cos(alpha), radius * sin(alpha));
             currentCircle = (currentCircle + 1) % circles;
@@ -74,14 +80,14 @@ static double const GenerationDistance = 100.0;
         minRadius += circles * CircleDistance + GenerationDistance;
     }
     
-    NSUInteger width = MAX(2*minRadius, self.view.frame.size.width);
-    NSUInteger height = MAX(2*minRadius, self.view.frame.size.height);
-    [self.containerView setFrame:CGRectMake(0, 0, width, height)];
-    [self.scrollView setContentSize:CGSizeMake(width, height)];
-    CGAffineTransform move = CGAffineTransformMakeTranslation(width/2, height/2);
-    for (NodeView *nodeView in self.containerView.subviews) {
-        [nodeView setTransform:move];
-    }
+//    NSUInteger width = MAX(2*minRadius, self.view.frame.size.width);
+//    NSUInteger height = MAX(2*minRadius, self.view.frame.size.height);
+//    [self.containerView setFrame:CGRectMake(0, 0, width, height)];
+//    [self.scrollView setContentSize:CGSizeMake(width, height)];
+//    CGAffineTransform move = CGAffineTransformMakeTranslation(width/2, height/2);
+//    for (NodeView *nodeView in self.containerView.subviews) {
+//        [nodeView setTransform:move];
+//    }
 }
 
 - (NSArray*)arrayWithGenerations
@@ -110,22 +116,22 @@ static double const GenerationDistance = 100.0;
     return Generations;
 }
 
-- (NodeView*)nodeViewForNode:(NodeForURL*)node withGeneration:(NSUInteger)generation
+- (NodeView*)nodeViewForNode:(NodeForURL*)node
 {
-    NSUInteger nodeSize = NodeSize - MIN(25, 5*generation);
-    NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(0, 0, nodeSize, nodeSize)];
+   // NSUInteger nodeSize = NodeSize - MIN(25, 5*generation);
+    NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(10, 10, NodeSize, NodeSize)];
     //NodeView *nodeView = [[[NSBundle mainBundle] loadNibNamed:@"CircleNodeView" owner:self options:nil]objectAtIndex:0];
     nodeView.node = node;
     //nodeView.layer.cornerRadius = NodeSize/2;
     CAShapeLayer *circle = [CAShapeLayer layer];
     
-    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, nodeSize, nodeSize)cornerRadius:nodeSize].CGPath;
+    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(10, 10, NodeSize, NodeSize)cornerRadius:NodeSize].CGPath;
     circle.masksToBounds = NO;
     circle.shadowOffset = CGSizeMake(-5, 10);
     circle.shadowRadius = 5;
     circle.shadowOpacity = 0.5;
-    circle.position = CGPointMake(CGRectGetMidX(nodeView.frame)-nodeSize/2,
-                                  CGRectGetMidY(nodeView.frame)-nodeSize/2);
+    circle.position = CGPointMake(CGRectGetMidX(nodeView.frame)-NodeSize/2,
+                                  CGRectGetMidY(nodeView.frame)-NodeSize/2);
         if (node.countURLs > 0 && node.countURLs < 5) {
             circle.fillColor = [[UIColor redColor] CGColor];
         } else if (node.countURLs >= 5 && node.countURLs < 10) {
@@ -145,7 +151,7 @@ static double const GenerationDistance = 100.0;
         }
 
     [nodeView.layer addSublayer:circle];
-    nodeView.alpha = 1.0 / (generation + 1.0);
+   // nodeView.alpha = 1.0 / (generation + 1.0);
 
 //    nodeView.layer.masksToBounds = YES;
 //    nodeView.alpha = 1.0 / (generation + 1.0);
@@ -175,15 +181,6 @@ static double const GenerationDistance = 100.0;
 {
     NSUInteger countForMinCircle = MAX(1, [self nodesCountForRadius:minRadius]);
     return ((nodesCount - 1) / countForMinCircle) + 1;
-}
-
-//The event handling method
-- (void)handleSingleTap:(UITapGestureRecognizer *)recognizer {
-    NSLog(@"Line tap was here: %@", recognizer.view);
-}
-- (void)handleSingleTapNodeView:(UITapGestureRecognizer *)recognizer
-{
-    NSLog(@"Node tap happened: x = %@, y = %@", @(recognizer.view.center.x), @(recognizer.view.center.y));
 }
 
 - (float)circleRadiusForNodeCount:(NSUInteger)nodeCount
