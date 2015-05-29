@@ -14,7 +14,6 @@
 @property (nonatomic, strong) Graph *graph;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UIView *containerView;
-@property (nonatomic) NSUInteger gestureCount;
 
 @end
 
@@ -41,25 +40,15 @@
     
     self.graph = [[Graph alloc] initGraphWithRootLink:@"http://www.raywenderlich.com"];
     [self.graph breadthFirstSearchFromNode:self.graph.rootNode handler:^(NodeForURL *node) {
+        
         NodeView *nodeView = [[NodeView alloc] initViewForNode:node];
-       
+        [UIView animateWithDuration:2.25 animations:^{
+            nodeView.alpha = 1;
+            nodeView.transform = CGAffineTransformMakeScale(2, 2);
+        }];
         nodeView.center = CGPointMake(arc4random()%400, arc4random()%800);
         [self.containerView addSubview:nodeView];
     }];
-}
-
-
--(void)handlePinchWithGestureRecognizer:(UIPinchGestureRecognizer *)pinchGestureRecognizer{
- 
-        switch (pinchGestureRecognizer.state) {
-        case UIGestureRecognizerStateRecognized: {
-            NSLog(@">>>>>>>>>>>>>>>>>>>>>>>");
-            self.gestureCount++;
-        } break;
-
-        default: {
-        } break;
-    }
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
