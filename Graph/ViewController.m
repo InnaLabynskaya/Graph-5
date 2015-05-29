@@ -42,8 +42,8 @@ static double const GenerationDistance = 100.0;
 - (void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    self.containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1500, 1500)];
-    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 1500, 1500)];
+    self.containerView.frame = CGRectMake(0, 0, 500, 500);
+    self.scrollView.contentSize = self.containerView.frame.size;
     self.scrollView.minimumZoomScale = 0.5;
     self.scrollView.maximumZoomScale = 5.0;
     self.scrollView.delegate = self;
@@ -52,10 +52,11 @@ static double const GenerationDistance = 100.0;
     self.graph = [[Graph alloc] initGraphWithRootLink:@"http://www.raywenderlich.com"];
     [self.graph breadthFirstSearchFromNode:self.graph.rootNode handler:^(NodeForURL *node) {
         NodeView *nodeView = [self nodeViewForNode:node];
-        [self.scrollView addSubview:nodeView];
+        nodeView.frame = CGRectMake(arc4random()%500, arc4random()%500, NodeSize, NodeSize);
+        [self.containerView addSubview:nodeView];
     }];
-    
 }
+
 - (void)updateNodesView
 {
     NSArray *generations = [self arrayWithGenerations];
@@ -119,13 +120,13 @@ static double const GenerationDistance = 100.0;
 - (NodeView*)nodeViewForNode:(NodeForURL*)node
 {
    // NSUInteger nodeSize = NodeSize - MIN(25, 5*generation);
-    NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(10, 10, NodeSize, NodeSize)];
+    NodeView *nodeView = [[NodeView alloc] initWithFrame:CGRectMake(0, 0, NodeSize, NodeSize)];
     //NodeView *nodeView = [[[NSBundle mainBundle] loadNibNamed:@"CircleNodeView" owner:self options:nil]objectAtIndex:0];
     nodeView.node = node;
     //nodeView.layer.cornerRadius = NodeSize/2;
     CAShapeLayer *circle = [CAShapeLayer layer];
     
-    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(10, 10, NodeSize, NodeSize)cornerRadius:NodeSize].CGPath;
+    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, NodeSize, NodeSize)cornerRadius:NodeSize].CGPath;
     circle.masksToBounds = NO;
     circle.shadowOffset = CGSizeMake(-5, 10);
     circle.shadowRadius = 5;
