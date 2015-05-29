@@ -14,4 +14,6 @@
 
 @property (nonatomic, strong) NodeForURL *node;
 
+- (instancetype)initViewForNode:(NodeForURL*)node;
+
 @end
