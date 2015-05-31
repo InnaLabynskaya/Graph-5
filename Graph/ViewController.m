@@ -42,9 +42,9 @@
     [self.graph breadthFirstSearchFromNode:self.graph.rootNode handler:^(NodeForURL *node) {
         
         NodeView *nodeView = [[NodeView alloc] initViewForNode:node];
-        [UIView animateWithDuration:2.25 animations:^{
-            nodeView.alpha = 1;
-            nodeView.transform = CGAffineTransformMakeScale(2, 2);
+        nodeView.transform = CGAffineTransformMakeScale(0.1, 0.1);
+        [UIView animateWithDuration:1.0 animations:^{
+            nodeView.transform = CGAffineTransformMakeScale(1, 1);
         }];
         nodeView.center = CGPointMake(arc4random()%400, arc4random()%800);
         [self.containerView addSubview:nodeView];

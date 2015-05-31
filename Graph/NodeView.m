@@ -13,6 +13,7 @@ static NSUInteger NodeSize = 30;
 
 @property (nonatomic, weak) UILabel *urlLabel;
 @property (nonatomic, strong) LineView *neighboursLineView;
+@property (strong, nonatomic) CAShapeLayer *circle;
 
 @end
 
@@ -22,35 +23,9 @@ static NSUInteger NodeSize = 30;
 {
     self = [super initWithFrame:CGRectMake(0, 0, NodeSize, NodeSize)];
     if (self) {
+        [self initShape];
         self.node = node;
-        CAShapeLayer *circle = [CAShapeLayer layer];
-        
-        circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, NodeSize, NodeSize)cornerRadius:NodeSize].CGPath;
-        circle.masksToBounds = NO;
-        circle.shadowOffset = CGSizeMake(-5, 10);
-        circle.shadowRadius = 5;
-        circle.shadowOpacity = 0.5;
-        circle.position = CGPointMake(CGRectGetMidX(self.frame)-NodeSize/2,
-                                      CGRectGetMidY(self.frame)-NodeSize/2);
-        if (node.countURLs > 0 && node.countURLs < 5) {
-            circle.fillColor = [[UIColor redColor] CGColor];
-        } else if (node.countURLs >= 5 && node.countURLs < 10) {
-            circle.fillColor = [[UIColor yellowColor] CGColor];
-        } else if (node.countURLs >=10 && node.countURLs < 20) {
-            circle.fillColor = [[UIColor orangeColor] CGColor];
-        } else if (node.countURLs >=20 && node.countURLs < 30) {
-            circle.fillColor = [[UIColor purpleColor] CGColor];
-        } else if (node.countURLs >=30 && node.countURLs < 50) {
-            circle.fillColor = [[UIColor greenColor] CGColor];
-        } else if (node.countURLs >=50 && node.countURLs <100) {
-            circle.fillColor = [[UIColor blueColor] CGColor];
-        } else if (node.countURLs >= 100 && node.countURLs <200) {
-            circle.fillColor = [[UIColor magentaColor] CGColor];
-        } else {
-            circle.fillColor = [[UIColor cyanColor] CGColor];
-        }
-        [self.layer addSublayer:circle];
-        [self initializeSubviews];
+        [self upDateWithModel];
     }
     return self;
 }
@@ -60,17 +35,46 @@ static NSUInteger NodeSize = 30;
     self = [super initWithCoder:aDecoder];
     if (self) {
         
-        [self initializeSubviews];
+        [self initShape];
     }
     return self;
 }
 
-- (void)initializeSubviews
+- (void)initShape
 {
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-    self.urlLabel = label;
-    [self.urlLabel setTextAlignment:NSTextAlignmentCenter];
-    [self addSubview:self.urlLabel];
+    CAShapeLayer *circle = [CAShapeLayer layer];
+    self.circle = circle;
+    circle.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, NodeSize, NodeSize)cornerRadius:NodeSize].CGPath;
+    circle.masksToBounds = NO;
+    circle.shadowOffset = CGSizeMake(-5, 10);
+    circle.shadowRadius = 5;
+    circle.shadowOpacity = 0.5;
+    circle.position = CGPointMake(CGRectGetMidX(self.frame)-NodeSize/2,
+                                  CGRectGetMidY(self.frame)-NodeSize/2);
+    [self.layer addSublayer:circle];
+}
+
+- (void)upDateWithModel
+{
+    
+    if (self.node.countURLs > 0 && self.node.countURLs < 5) {
+        self.circle.fillColor = [[UIColor redColor] CGColor];
+    } else if (self.node.countURLs >= 5 && self.node.countURLs < 10) {
+        self.circle.fillColor = [[UIColor yellowColor] CGColor];
+    } else if (self.node.countURLs >=10 && self.node.countURLs < 20) {
+        self.circle.fillColor = [[UIColor orangeColor] CGColor];
+    } else if (self.node.countURLs >=20 && self.node.countURLs < 30) {
+        self.circle.fillColor = [[UIColor purpleColor] CGColor];
+    } else if (self.node.countURLs >=30 && self.node.countURLs < 50) {
+        self.circle.fillColor = [[UIColor greenColor] CGColor];
+    } else if (self.node.countURLs >=50 && self.node.countURLs <100) {
+        self.circle.fillColor = [[UIColor blueColor] CGColor];
+    } else if (self.node.countURLs >= 100 && self.node.countURLs <200) {
+        self.circle.fillColor = [[UIColor magentaColor] CGColor];
+    } else {
+        self.circle.fillColor = [[UIColor cyanColor] CGColor];
+    }
+    self.alpha = 1.0/(self.node.level + 1.0);
 }
 
 - (void)setNode:(NodeForURL *)node

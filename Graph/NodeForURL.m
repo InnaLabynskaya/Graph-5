@@ -12,12 +12,12 @@
 
 @property (strong, nonatomic, readwrite) NSString *url;
 @property (strong, nonatomic, readwrite) NSMutableSet *edges;
-
+@property (nonatomic, readwrite) NSUInteger level;
 @end
 
 @implementation NodeForURL
 
-- (instancetype)initWithUrl:(NSString*)url
+- (instancetype)initWithUrl:(NSString*)url andLevel:(NSUInteger)level
 {
     self = [super init];
     if (self) {
@@ -25,13 +25,14 @@
         self.url = url;
         self.edges = [NSMutableSet set];
         self.countURLs = 1;
+        self.level = level;
     }
     return self;
 }
 
 - (instancetype)init
 {
-    return [self initWithUrl:nil];
+    return [self initWithUrl:nil andLevel:0];
 }
 
 - (void)addEdgeToNode:(NodeForURL *)node

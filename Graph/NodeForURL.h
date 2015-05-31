@@ -13,10 +13,11 @@
 
 @property (strong, nonatomic, readonly) NSString *url;
 @property (strong, nonatomic, readonly) NSMutableSet *edges;
+@property (nonatomic, readonly) NSUInteger level;
 @property (nonatomic) BOOL wasParsed;
 @property (nonatomic) NSUInteger countURLs;
 
-- (instancetype)initWithUrl:(NSString*)url;
+- (instancetype)initWithUrl:(NSString*)url andLevel:(NSUInteger)level;
 
 - (void)addEdgeToNode:(NodeForURL *)node;
 - (void)removeEdgeToNode:(NodeForURL *)node;

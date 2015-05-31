@@ -26,7 +26,7 @@
         self.nodes = [NSMutableDictionary dictionary];
         NSURL *url = [NSURL URLWithString:rootUrl];
         self.rootUrl = [NSString stringWithFormat:@"%@://%@", [url scheme], [url host]];
-        self.rootNode = [[NodeForURL alloc] initWithUrl:@"/"];
+        self.rootNode = [[NodeForURL alloc] initWithUrl:@"/" andLevel:0];
         [self addNode:self.rootNode];
     }
     return self;
@@ -53,25 +53,25 @@
 {
      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
          NSLog(@"Breath-first-search STARTS");
-    NSMutableSet *visitedNodes = [NSMutableSet set];
-    NSMutableArray *queue = [NSMutableArray arrayWithObject:node];
-  
-    while (queue.count > 0) {
-        NodeForURL *currentNode = queue.firstObject;
-        
-        [self parseNode:currentNode];
-       dispatch_async(dispatch_get_main_queue(), ^{
-           handler(node);
-       });
-        [visitedNodes addObject:currentNode];
-        [queue removeObject:currentNode];
-        for (NSString *nodeUrl in currentNode.edges) {
-            NodeForURL *newNode = [self nodeForUrl:nodeUrl];
-            if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
-                [queue addObject:newNode];
-            } 
-        }
-    }
+         NSMutableSet *visitedNodes = [NSMutableSet set];
+         NSMutableArray *queue = [NSMutableArray arrayWithObject:node];
+         
+         while (queue.count > 0) {
+             NodeForURL *currentNode = queue.firstObject;
+             
+             [self parseNode:currentNode];
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 handler(currentNode);
+             });
+             [visitedNodes addObject:currentNode];
+             [queue removeObject:currentNode];
+             for (NSString *nodeUrl in currentNode.edges) {
+                 NodeForURL *newNode = [self nodeForUrl:nodeUrl];
+                 if (newNode && ![visitedNodes containsObject:newNode] && ![queue containsObject:newNode]) {
+                     [queue addObject:newNode];
+                 } 
+             }
+         }
     });
 }
 
@@ -103,7 +103,7 @@
             
             NodeForURL *nextNode = [self nodeForUrl:url];
             if (!nextNode) {
-                nextNode = [[NodeForURL alloc] initWithUrl:url];
+                nextNode = [[NodeForURL alloc] initWithUrl:url andLevel:(node.level + 1)];
             }
             [self addNode:nextNode];
             [node addEdgeToNode:nextNode];
