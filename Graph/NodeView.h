@@ -13,7 +13,9 @@
 @interface NodeView : UIView
 
 @property (nonatomic, strong) NodeForURL *node;
+@property (nonatomic) NSUInteger currentLevel;
 
 - (instancetype)initViewForNode:(NodeForURL*)node;
+- (void)upDateWithModel;
 
 @end

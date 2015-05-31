@@ -25,7 +25,6 @@ static NSUInteger NodeSize = 30;
     if (self) {
         [self initShape];
         self.node = node;
-        [self upDateWithModel];
     }
     return self;
 }
@@ -56,31 +55,40 @@ static NSUInteger NodeSize = 30;
 
 - (void)upDateWithModel
 {
-    
-    if (self.node.countURLs > 0 && self.node.countURLs < 5) {
-        self.circle.fillColor = [[UIColor redColor] CGColor];
-    } else if (self.node.countURLs >= 5 && self.node.countURLs < 10) {
-        self.circle.fillColor = [[UIColor yellowColor] CGColor];
-    } else if (self.node.countURLs >=10 && self.node.countURLs < 20) {
-        self.circle.fillColor = [[UIColor orangeColor] CGColor];
-    } else if (self.node.countURLs >=20 && self.node.countURLs < 30) {
-        self.circle.fillColor = [[UIColor purpleColor] CGColor];
-    } else if (self.node.countURLs >=30 && self.node.countURLs < 50) {
-        self.circle.fillColor = [[UIColor greenColor] CGColor];
-    } else if (self.node.countURLs >=50 && self.node.countURLs <100) {
-        self.circle.fillColor = [[UIColor blueColor] CGColor];
-    } else if (self.node.countURLs >= 100 && self.node.countURLs <200) {
-        self.circle.fillColor = [[UIColor magentaColor] CGColor];
+    if (self.node.level < self.currentLevel) {
+        self.alpha = 0;
     } else {
-        self.circle.fillColor = [[UIColor cyanColor] CGColor];
+        if (self.node.countURLs > 0 && self.node.countURLs < 5) {
+            self.circle.fillColor = [[UIColor redColor] CGColor];
+        } else if (self.node.countURLs >= 5 && self.node.countURLs < 10) {
+            self.circle.fillColor = [[UIColor yellowColor] CGColor];
+        } else if (self.node.countURLs >=10 && self.node.countURLs < 20) {
+            self.circle.fillColor = [[UIColor orangeColor] CGColor];
+        } else if (self.node.countURLs >=20 && self.node.countURLs < 30) {
+            self.circle.fillColor = [[UIColor purpleColor] CGColor];
+        } else if (self.node.countURLs >=30 && self.node.countURLs < 50) {
+            self.circle.fillColor = [[UIColor greenColor] CGColor];
+        } else if (self.node.countURLs >=50 && self.node.countURLs <100) {
+            self.circle.fillColor = [[UIColor blueColor] CGColor];
+        } else if (self.node.countURLs >= 100 && self.node.countURLs <200) {
+            self.circle.fillColor = [[UIColor magentaColor] CGColor];
+        } else {
+            self.circle.fillColor = [[UIColor cyanColor] CGColor];
+        }
+        self.alpha = 1.0/(self.node.level - self.currentLevel + 1.0);
     }
-    self.alpha = 1.0/(self.node.level + 1.0);
 }
 
 - (void)setNode:(NodeForURL *)node
 {
     _node = node;
-    self.urlLabel.text = [@(node.countURLs) stringValue];//node.url;
+    [self upDateWithModel];
+}
+
+- (void)setCurrentLevel:(NSUInteger)currentLevel
+{
+    _currentLevel = currentLevel;
+    [self upDateWithModel];
 }
 
 //- (void)drawRect:(CGRect)rect
